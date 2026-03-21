@@ -2,7 +2,7 @@
 """Image autoencoder pipeline using Gemini models.
 
 Encodes images to text via Gemini Flash, reconstructs them via Gemini image
-generation, and computes MSE between originals and reconstructions.
+generation, and computes RMSE between originals and reconstructions.
 """
 
 import argparse
@@ -39,6 +39,7 @@ def encode_image(client: genai.Client, image_path: Path, prompt: str) -> str:
     response = client.models.generate_content(
         model=ENCODE_MODEL,
         contents=[prompt, img],
+        config=types.GenerateContentConfig(temperature=0.0),
     )
     return response.text
 
@@ -50,6 +51,7 @@ def decode_encoding(client: genai.Client, encoding: str, prompt: str) -> Image.I
         contents=f"{prompt}\n\n{encoding}",
         config=types.GenerateContentConfig(
             response_modalities=["IMAGE"],
+            temperature=0.0,
         ),
     )
     for part in response.candidates[0].content.parts:
@@ -59,19 +61,19 @@ def decode_encoding(client: genai.Client, encoding: str, prompt: str) -> Image.I
 
 
 def compute_mse(original: Path, reconstructed: Image.Image) -> float:
-    """Compute per-pixel MSE between the original and reconstructed images."""
+    """Compute per-pixel RMSE between the original and reconstructed images."""
     orig = np.array(Image.open(original).convert("RGB"), dtype=np.float64)
     recon = np.array(
         reconstructed.convert("RGB").resize((orig.shape[1], orig.shape[0])),
         dtype=np.float64,
     )
-    return float(np.mean((orig - recon) ** 2))
+    return float(np.sqrt(np.mean((orig - recon) ** 2)))
 
 
 def main():
     parser = argparse.ArgumentParser(
         description="Image autoencoder: encode images to text via Gemini Flash, "
-        "reconstruct via Gemini image generation, and measure MSE."
+        "reconstruct via Gemini image generation, and measure RMSE."
     )
     parser.add_argument("images_dir", help="Path to directory containing input images")
     parser.add_argument(
@@ -138,15 +140,15 @@ def main():
         comparison.save(comp_path)
         print(f"  Comparison: {comp_path}")
 
-        # MSE
+        # RMSE
         mse = compute_mse(img_path, reconstructed)
-        print(f"  MSE: {mse:.2f}\n")
+        print(f"  RMSE: {mse:.2f}\n")
 
         results.append({"image": img_path.name, "mse": mse, "words": word_count})
 
     # Summary
     print("=" * 55)
-    print(f"{'Image':<30} {'MSE':>12} {'Words':>10}")
+    print(f"{'Image':<30} {'RMSE':>12} {'Words':>10}")
     print("-" * 55)
     for r in results:
         print(f"{r['image']:<30} {r['mse']:>12.2f} {r['words']:>10}")

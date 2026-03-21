@@ -11,6 +11,10 @@ import os
 import sys
 from pathlib import Path
 
+# Fix Windows console encoding
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 import numpy as np
 from dotenv import load_dotenv
 from google import genai
@@ -123,6 +127,16 @@ def main():
         recon_path = output_dir / f"{img_path.stem}_reconstructed.png"
         reconstructed.save(recon_path)
         print(f"  Saved: {recon_path}")
+
+        # Side-by-side comparison
+        original = Image.open(img_path).convert("RGB")
+        recon_resized = reconstructed.convert("RGB").resize(original.size)
+        comparison = Image.new("RGB", (original.width * 2, original.height))
+        comparison.paste(original, (0, 0))
+        comparison.paste(recon_resized, (original.width, 0))
+        comp_path = output_dir / f"{img_path.stem}_comparison.png"
+        comparison.save(comp_path)
+        print(f"  Comparison: {comp_path}")
 
         # MSE
         mse = compute_mse(img_path, reconstructed)

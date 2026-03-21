@@ -22,7 +22,6 @@ The encoding uses these fields in order, one per line, labeled as shown. Omit an
 - Quantify where possible: positions (%, quadrants, clock positions), sizes (relative to frame), counts, angles.
 - Do NOT include: emotional interpretations, artistic analysis, narrative speculation, any word that doesn't help reconstruct pixels.
 - Every token costs. Maximize information per token.
-- Target: under 150 tokens for simple images, under 300 for complex scenes. Never exceed 400.
 
 ## When Decoding (Text → Image)
 

@@ -37,4 +37,6 @@ The encoding uses these fields in order, one per line, labeled as shown. Omit an
 
 ---
 
-MODE: ENCODE
+Set MODE to ENCODE when compressing an image into text, or DECODE when reconstructing an image from text.
+
+MODE:

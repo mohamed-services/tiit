@@ -21,8 +21,8 @@ from google import genai
 from google.genai import types
 from PIL import Image
 
-ENCODE_MODEL = "gemini-3.1-flash-lite-preview"
-DECODE_MODEL = "gemini-3.1-flash-image-preview"
+ENCODE_MODEL = "gemini-3.1-pro-preview"
+DECODE_MODEL = "gemini-3-pro-image-preview"
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif", ".tiff"}
 
 
